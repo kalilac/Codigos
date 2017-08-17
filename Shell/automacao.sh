@@ -179,6 +179,30 @@ zhonechecklostonu(){
 
 }
 
+calixchecklostonu(){
+
+	expect -c 'spawn ssh kalil@'""$2""';
+	    expect : ;
+	       send "123mudar.\n";
+	       expect > ;
+	       send "show ont discovered on-gpon-port '""$1""'\n";
+	       expect > ;
+		   send "exit\n";
+	    interact'
+}
+
+calixcheckenableonu(){
+
+	expect -c 'spawn ssh kalil@'""$2""';
+	    expect : ;
+	       send "123mudar.\n";
+	       expect > ;
+	       send "show ont on-gpon-port '""$1""'\n";
+	       expect > ;
+		   send "exit\n";
+	    interact'
+}
+
 zhonecheckall(){
 
 	expect -c 'spawn telnet '""$2""';
@@ -287,15 +311,19 @@ zhonecheckcpeport(){
 
 }
 
-if [ $1 == "zhoneipho" ]; then
+if [ $1 == "zhoneaddremipho" ]; then
 
 	adddelonuiphotonics $2 $3 $4 $5
 
-elif [ $1 == "zhonezhon" ]; then
+elif [ $1 == "zhoneaddremzhon" ]; then
 
 	adddelonuzhone $2 $3 $4 $5
 
-elif [ $1 == "zhonecheck" ]; then
+elif [ $1 == "calixaddrem" ]; then
+
+	adddelonucalix $2 $3 $4 $5
+
+elif [ $1 == "zhonechecklost" ]; then
 
 	zhonechecklostonu $2 $3
 
@@ -322,4 +350,13 @@ elif [ $1 == "zhonebridgeshow" ]; then
 elif [ $1 == "zhonecpeport" ]; then
 
 	zhonecheckcpeport $2 $3 $4
+
+elif [ $1 == "calixchecklost" ]; then
+
+	calixchecklostonu $2 $3
+
+elif [ $1 == "calixcheckenabled" ]; then
+
+	calixcheckenableonu $2 $3
+
 fi;
