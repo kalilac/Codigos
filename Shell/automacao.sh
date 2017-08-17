@@ -131,9 +131,13 @@ adddelonucalix(){
 
 			profilemodem="813G-L3"
 
-		elif [ $5 == "400" ]; then
+		elif [ $5 == "716" ]; then
 
-		    profilemodem="4000"
+		    profilemodem="716GE-1-L3"
+
+		elif [ $5 == "844" ]; then
+
+			profilemodem="844G-L3"
 
 		fi;
 		
@@ -143,7 +147,7 @@ adddelonucalix(){
 		    expect : ;
 	           send "123mudar.\n";
 		       expect >;
-		       send "create ont 59'""$2""' profile 813G-L3 serial-number '""$profilemodem""' admin-state enabled\n";
+		       send "create ont 59 profile '""$profilemodem""' serial-number '""$2""' admin-state enabled\n";
 		       expect >;
 		       send "set ont-port 59'""$2""'/G1 rg-mgmt-profile Rg-Mgmt-Prof-1\n";
 		       expect >;
