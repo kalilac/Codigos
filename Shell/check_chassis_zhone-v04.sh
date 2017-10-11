@@ -13,6 +13,7 @@ USER="usercheck"
 PASS="123mudar."
 OUTPUT=NULL
 unus=""
+fanalarms=""
 
 activesonus(){
 
@@ -40,6 +41,8 @@ onustotals(){
 
 checkstats(){
 
+    re='^[0-9]+$'
+
 	if [ $1 -ge $2 ]; then
 
 		service_state="WARNING"
@@ -48,6 +51,11 @@ checkstats(){
 	elif [ $1 -ge $3 ]; then
 
 		service_state="CRITICAL"
+		signal_output="2"
+
+	elif [ $1 -lt 0 ] || ! [[ $1 =~ $re ]]; then
+
+        service_state="UNKNOWN"
 		signal_output="2"
 
 	else
@@ -101,6 +109,21 @@ checkeapsstate(){
 
 }
 
+checkfanstatus(){
+
+	expect -c 'spawn telnet '""$1""';
+				    expect : ;
+				    send '""$USER"\n"';
+				    expect : ;
+				    send '""$PASS"\n"';
+				    expect > ;
+				    send "shelfctrl monitor\n";
+				    expect > ;
+					send "exit\n";
+				interact' | grep "Fan alarm" | cut -f 2- -d " "
+
+}
+
 if [ -z "$snmpversion" ] || [ -z "$snmpcommunity" ] || [ -z "$checktype" ] || [ -z "$host" ] || [ -z "$optargs" ] || [ -z "$warntarget" ] || [ -z "$crittarget" ]; then
 
     echo "Favor definir todos os parametros"
@@ -111,17 +134,42 @@ else
 	if [ $checktype == "temp" ]; then
 
 		current_temp=`snmpwalk -v $snmpversion -c $snmpcommunity $host .1.3.6.1.4.1.5504.3.2.4.1.2.1.1 | awk -F ": " '{print $2}'`
+		
+		if [ -z "$current_temp" ]; then
+
+        	current_temp="NOTRESPOND"
+
+        fi
+
 		echo "Temp: "$current_temp"C | Temperature="$current_temp"C Warning="$6"C Critical="$7"C"
 		checkstats $current_temp $6 $7 $checktype
 		
 	elif [ $checktype == "fan" ]; then
 
 		current_fan=`snmpwalk -v $snmpversion -c $snmpcommunity $host .1.3.6.1.4.1.5504.3.2.2.1.4 | awk -F ": " '{print $2}' | cut -f 2 -d "(" | cut -f 1 -d ")"`
-		checkstats $current_fan $6 $7 $checktype
+		
+		if [ -z "$current_fan" ]; then
+
+			current_fan="NOTRESPOND"
+
+		elif [ $current_fan -ne 1 ]; then
+
+			fanalarms=$(checkfanstatus $host $slot $card)
+
+		fi
+
+		checkstats $current_fan $6 $7 "$checktype $fanalarms"
 
 	elif [ $checktype == "cpu" ]; then
 
 		current_cpu=`snmpwalk -v $snmpversion -c $snmpcommunity $host .1.3.6.1.4.1.5504.3.3.3.1.5.1.$5 |  awk -F ": " '{print $2}' | cut -f 2 -d "(" | cut -f 1 -d ")"`
+        
+        if [ -z "$current_cpu" ]; then
+
+        	current_cpu="NOTRESPOND"
+
+        fi
+
         echo "cpu: "$current_cpu "| cpu="$current_cpu";"$6";"$7 
         checkstats $current_cpu $6 $7 $checktype
 
@@ -136,11 +184,25 @@ else
     elif [ $checktype == "memorystatus" ]; then
 
     	memorystatus=`snmpwalk -v $snmpversion -c $snmpcommunity $host .1.3.6.1.4.1.5504.3.3.3.1.6.1.$5 | awk -F ": " '{print $2}' | cut -f 2 -d "(" | cut -f 1 -d ")"`
+    	 
+    	if [ -z "$memorystatus" ]; then
+
+    		memorystatus="NOTRESPOND"
+
+    	fi
+
     	checkstats $memorystatus $6 $7 $checktype
 
     elif [ $checktype == "cardstatus" ]; then
 
     	cardstatus=`snmpwalk -v $snmpversion -c $snmpcommunity $host .1.3.6.1.4.1.5504.3.3.1.1.9.1.$5 | awk -F ": " '{print $2}' | cut -f 2 -d "(" | cut -f 1 -d ")"`
+    	
+    	if [ -z "$cardstatus" ]; then
+
+    		cardstatus="NOTRESPOND"
+
+    	fi
+
     	checkstats $cardstatus $6 $7 $checktype
 
     elif [ $checktype == "eapsstate" ]; then
