@@ -5,10 +5,11 @@
 TEST="True"
 DNSSERVER="192.168.222.100"
 logfile="/var/log/logdnscheck.log"
-NAMESITES=("www.uol.com.br" "www.google.com.br" "www.ig.com.br" "terra.com.br" "www.yahoo.com.br")
+NAMESITES=("www.uol.com.br" "www.google.com.br" "www.ig.com.br" "terra.com.br" "www.yahoo.com.br" "youtube.com" "www.intel.com" "g1.com.br" "facebook.com" "amd.com")
 queryanser="null"
 answerproblem="False"
 birdstoped="False"
+trycheck=1
 
 startservice(){
 	
@@ -30,7 +31,7 @@ restartservice(){
 
 doaquery(){
 
-	idquery=$((1 + RANDOM % 5))
+	idquery=$((1 + RANDOM % 10))
     askquery=$(echo ${NAMESITES[$idquery]})
     queryanswer=$(dig +short +retry=0 +timeout=0 @$DNSSERVER $askquery | tail -1)
 
@@ -56,16 +57,27 @@ checkanswer(){
 
 }
 
-while [ $TEST == "True" ];
-    
-    do
+simplecheckwanser(){
 
-    	checkanswer
-    	trycheck=1
+    doaquery
 
-    	if [ $answerproblem == "True" ]; then
+    if [ -z $queryanswer ] || [[ $queryanswer == ";; connection timed out; no servers could be reached" ]]; then
 
-    		while [ $trycheck -lt 5 ];
+    	answerproblem="True"
+
+    else
+
+    	answerproblem="False"
+
+    fi
+
+}
+
+forcefix(){
+
+	trycheck=1
+
+	while [ $trycheck -lt 5 ];
 
     		    do
 
@@ -80,6 +92,40 @@ while [ $TEST == "True" ];
     		    	fi
 
     		    	trycheck=$(($trycheck+1))
+
+    		    done;
+
+}
+
+while [ $TEST == "True" ];
+    
+    do
+
+    	simplecheckwanser
+    	newchecks=0
+
+    	if [ $answerproblem == "True" ]; then
+
+    		while [ $newchecks -lt 3 ];
+
+    		    do
+    		    	simplecheckwanser
+
+    		    	if [ $answerproblem == "True" ]; then
+
+    		    		newchecks=$(($newchecks+1))
+
+    		    		if [ $newchecks -eq 3 ]; then
+
+    		    			forcefix
+
+    		    		fi
+
+    		    	else
+
+    		    		newchecks=5
+
+    		    	fi
 
     		    done;
 
