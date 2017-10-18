@@ -10,6 +10,19 @@ testfunc(){
 	
 }
 
-testfunc $c c
+#testfunc $c c
 
-echo $c
+for name in $(cat /tmp/teste.txt);
+    do
+
+    	c="$name $c"
+    	c1=($c)
+
+    done
+
+searchfactor=4
+
+idquery=$((1 + RANDOM % $searchfactor))
+
+
+echo ${c1[$idquery]}
