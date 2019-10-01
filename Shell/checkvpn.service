@@ -1,0 +1,9 @@
+[Unit]
+Description = VPN serivce check
+After = network.target
+
+[Service]
+ExecStart = /usr/sbin/checkvpn.sh
+
+[Install]
+WantedBy = multi-user.target

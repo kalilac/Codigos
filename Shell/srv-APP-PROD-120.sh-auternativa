@@ -1,0 +1,7 @@
+#!/bin/bash
+
+    expect -c 'spawn ssh -p 22 root@10.103.0.120;
+        expect : ;
+	send "u7Ag8BY7RVPnqTU\n";
+	interact'
+

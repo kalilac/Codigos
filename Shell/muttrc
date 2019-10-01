@@ -1,0 +1,15 @@
+set realname = "Relatorio das imporessoras"
+set from = "medicaoti@arenadunas.com.br"
+set use_from = yes
+set envelope_from = yes
+
+set smtp_url = "smtps://maq-laremrelatorios@arenadunas.com.br@email-ssl.com.br:465/"
+set smtp_pass = "g01rtX8F95IooSx"
+set imap_user = "maq-laremrelatorios@arenadunas.com.br"
+set imap_pass = "g01rtX8F95IooSx"
+set folder = "imaps://email-ssl.com.br:993"
+set spoolfile = "+INBOX"
+set ssl_force_tls = yes
+set editor = "vim"
+set charset = "utf-8"
+set record = ''
