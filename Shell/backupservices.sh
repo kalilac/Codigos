@@ -95,5 +95,7 @@ for CLIENT in $(cat $CLIENTSFILE);
 
     	echo $CLIENT
     	#systembackup
+    	#copytotape
+    	#removedirectory
     
     done
