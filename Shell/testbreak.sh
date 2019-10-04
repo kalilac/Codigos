@@ -2,6 +2,8 @@
 
 set -x
 
+. /tmp/var.txt
+
 t=7
 
 for id in $(cat /tmp/lista_teste); 
@@ -15,3 +17,6 @@ for id in $(cat /tmp/lista_teste);
     done;
 
 echo "continua de qualquer jeito";
+
+
+echo $TESTEVAR
